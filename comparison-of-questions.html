@@ -1,0 +1,77 @@
+<html>
+<body>
+<div style="display: flex; justify-content: center;">
+    <div style="margin: 0 10px; display: flex; flex-direction: column;" id="left-column">
+        <button data-pair="pair4" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">1</button>
+        <button data-pair="pair1" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">2</button>
+        <button data-pair="pair5" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">3</button>
+        <button data-pair="pair2" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">4</button>
+        <button data-pair="pair3" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">5</button>
+    </div>
+
+    <div style="margin: 0 10px; display: flex; flex-direction: column;" id="right-column">
+        <button data-pair="pair1" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">Крикнуть «Барсик, открой!»</button>
+        <button data-pair="pair2" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">Зайти в комнату</button>
+        <button data-pair="pair3" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">Дать коту лакомство</button>
+        <button data-pair="pair4" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">Подойти к двери</button>
+        <button data-pair="pair5" style="margin: 5px; padding: 10px;" onclick="selectButton(this)">Дождаться, пока кот прыгнет на дверную ручку, и дверь откроется</button>
+    </div>
+</div>
+
+<script>
+let selectedButtons = { left: null, right: null };
+let foundPairs = new Set(); // Set to store matched pairs
+
+function updateButtonStyles(button, backgroundColor, textColor) {
+    button.style.backgroundColor = backgroundColor;
+    button.style.color = textColor;
+}
+
+function selectButton(button) {
+    const side = button.parentElement.id.includes('left') ? 'left' : 'right'
+    const pairValue = button.getAttribute('data-pair')
+
+    if (foundPairs.has(pairValue)) {
+        return
+    }
+
+    if (selectedButtons[side] && selectedButtons[side] !== button) {
+        updateButtonStyles(selectedButtons[side], '', '');// Clear style
+    }
+
+    if (selectedButtons[side] !== button) {
+        updateButtonStyles(button, 'yellow', '');// Select style
+        selectedButtons[side] = button;
+    } else {
+        updateButtonStyles(button, '', '');
+        selectedButtons[side] = null;
+    }
+
+    if (selectedButtons.left && selectedButtons.right) {
+        if (selectedButtons.left.getAttribute('data-pair') === selectedButtons.right.getAttribute('data-pair')) {
+        // Correct match! Make buttons blue.
+        updateButtonStyles(selectedButtons.left, 'lightblue', 'black');
+        updateButtonStyles(selectedButtons.right, 'lightblue', 'black');
+        foundPairs.add(selectedButtons.left.getAttribute('data-pair')); // Add to matched set
+
+        const firstCharLeftButton = selectedButtons.left.textContent.charAt(0);
+        selectedButtons.right.textContent = firstCharLeftButton + ' ' + selectedButtons.right.textContent;
+
+        // Clear selections
+        selectedButtons = { left: null, right: null };
+        } else {
+            updateButtonStyles(selectedButtons.left, 'red', '');
+            updateButtonStyles(selectedButtons.right, 'red', '');
+
+            setTimeout(() => {
+                updateButtonStyles(selectedButtons.left, '', '');
+                updateButtonStyles(selectedButtons.right, '', '');
+                selectedButtons = { left: null, right: null };
+            }, 1000);
+        }
+    }
+}
+</script>
+
+</body>
+</html>
